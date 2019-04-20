@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
+</head>
+<body>
+<nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
+    <a class="navbar-brand" href="#"></a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExampleDefault"
+            aria-controls="navbarsExampleDefault" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarsExampleDefault">
+        <ul class="navbar-nav mr-auto">
+            <li class="nav-item active">
+                <a class="nav-link" href="#">Outstander</a>
+            </li>
+        </ul>
+    </div>
+</nav>
+
+<main role="main">
+    <!-- Main jumbotron for a primary marketing message or call to action -->
+    <div class="jumbotron">
+        <div class="container">
+            <h1 class="display-3">Outstander</h1>
+            <p>Find an outstanding person from the past who had some common features with you!</p>
+            <form action="" method="post" class="form-inline">
+                {{ form.hidden_tag() }}
+                {{ form.vk_id(class_="form-control mb-2 mr-sm-2", placeholder="e.g. alexpulich or id1") }}
+                {{ form.submit(class_="btn btn-primary mb-2") }}
+            </form>
+        </div>
+    </div>
+    {% if false and queries %}
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <h1>Queries</h1>
+                {{queries}}
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    {% if data %}
+    <div class="container">
+        <div class="row">
+            <div class="card-group">
+                {% for item in data['results']['bindings'] %}
+                <div class="card">
+                    {% if item['picture'] %}
+                    <img class="card-img-top" src="{{ item['picture']['value'] }}" alt="Card image cap">
+                    {% endif %}
+                    <div class="card-body">
+                        <h5 class="card-title">{{ item['full_name']['value'] }}</h5>
+                        <p class="card-text"><strong>Birthday: </strong> {{ item['date']['value'] }}</p>
+                    </div>
+                    <div class="card-footer">
+                        <small class="text-muted">Last updated 3 mins ago</small>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</main>
+
+<footer class="container">
+    <p>© ITMO University project for Ontologies and knowledge representations by alexpulich, 2019 </p>
+</footer>
+<script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
+<script src="{{ url_for('static', filename='js/jquery-3.3.1.min.js') }}"></script>
+</body>
+</html>
