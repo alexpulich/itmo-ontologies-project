@@ -17,8 +17,16 @@ ENDPOINT = 'http://dbpedia.org/sparql'
 RU_REGEXP = re.compile(r'[a-яА-Я]+')
 app = Flask(__name__)
 app.config['SECRET_KEY'] = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(16))
-app.config['VK_LOGIN'] = os.environ.get('VK_LOGIN')
-app.config['VK_PASSWORD'] = os.environ.get('VK_PASSOWRD')
+
+provided_vk_login = os.environ.get('VK_LOGIN')
+provided_vk_pwd = os.environ.get('VK_PASSWORD')
+
+if provided_vk_login and provided_vk_pwd:
+    app.config['VK_LOGIN'] = provided_vk_login
+    app.config['VK_PASSWORD'] = provided_vk_pwd
+else:
+    app.config['VK_LOGIN'] = 'user_v2qjJtQM7SOFuvz'
+    app.config['VK_PASSWORD'] = 'ibbcc5O9QOpFn26'
 
 vk_session = vk_api.VkApi(app.config['VK_LOGIN'], app.config['VK_PASSWORD'])
 vk_session.auth()
