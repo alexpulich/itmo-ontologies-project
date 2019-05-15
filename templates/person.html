@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
+</head>
+<body>
+<nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
+    <a class="navbar-brand" href="#"></a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExampleDefault"
+            aria-controls="navbarsExampleDefault" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarsExampleDefault">
+        <ul class="navbar-nav mr-auto">
+            <li class="nav-item active">
+                <a class="nav-link" href="#">Outstander</a>
+            </li>
+        </ul>
+    </div>
+</nav>
+
+<main role="main">
+    <div class="jumbotron">
+        <div class="container">
+            <h1 class="display-3">Outstander</h1>
+            <p>Find an outstanding person from the past who had some common features with you!</p>
+            <a href="{{ url_for('index') }}" class="btn btn-primary">Back to search</a>
+        </div>
+    </div>
+    <div class="container">
+        <div class="row">
+            {% if father or mother or siblings or spouse %}
+                <div class="card-group">
+                    {% if father %}
+                        <div class="card">
+                            {% if father['picture'] %}
+                                <img class="card-img-top" src="{{ father['picture']['value'] }}" alt="Card image cap">
+                            {% endif %}
+                            <div class="card-body">
+                                <h5 class="card-title">{{ father['full_name']['value'] }}
+                                    <small class="text-muted">(Father)</small>
+                                </h5>
+                                <p class="card-text"><strong>Birthday: </strong> {{ father['date']['value'] }}</p>
+                            </div>
+                            <div class="card-footer">
+                                <a href="{{ url_for('person', uri=father['relative']['value']) }}"
+                                   class="btn btn-sm btn-primary">Show relatives</a>
+                            </div>
+                        </div>
+                    {% endif %}
+                    {% if mother %}
+                        <div class="card">
+                            {% if mother['picture'] %}
+                                <img class="card-img-top" src="{{ mother['picture']['value'] }}" alt="Card image cap">
+                            {% endif %}
+                            <div class="card-body">
+                                <h5 class="card-title">{{ mother['full_name']['value'] }}
+                                    <small class="text-muted">(Mother)</small>
+                                </h5>
+                                <p class="card-text"><strong>Birthday: </strong> {{ mother['date']['value'] }}</p>
+                            </div>
+                            <div class="card-footer">
+                                <a href="{{ url_for('person', uri=mother['relative']['value']) }}"
+                                   class="btn btn-sm btn-primary">Show relatives</a>
+                            </div>
+                        </div>
+                    {% endif %}
+                    {% if spouse %}
+                        <div class="card">
+                            {% if spouse['picture'] %}
+                                <img class="card-img-top" src="{{ spouse['picture']['value'] }}" alt="Card image cap">
+                            {% endif %}
+                            <div class="card-body">
+                                <h5 class="card-title">{{ spouse['full_name']['value'] }}
+                                    <small class="text-muted">(Spouse)</small>
+                                </h5>
+                                <p class="card-text"><strong>Birthday: </strong> {{ spouse['date']['value'] }}</p>
+                            </div>
+                            <div class="card-footer">
+                                <a href="{{ url_for('person', uri=spouse['relative']['value']) }}"
+                                   class="btn btn-sm btn-primary">Show relatives</a>
+                            </div>
+                        </div>
+                    {% endif %}
+                    {% if siblings %}
+                        {% for sibling in siblings %}
+                            <div class="card">
+                                {% if sibling['picture'] %}
+                                    <img class="card-img-top" src="{{ sibling['picture']['value'] }}"
+                                         alt="Card image cap">
+                                {% endif %}
+                                <div class="card-body">
+                                    <h5 class="card-title">{{ sibling['full_name']['value'] }}
+                                        <small class="text-muted">(Sibling)</small>
+                                    </h5>
+                                    <p class="card-text"><strong>Birthday: </strong> {{ sibling['date']['value'] }}</p>
+                                </div>
+                                <div class="card-footer">
+                                    <a href="{{ url_for('person', uri=sibling['relative']['value']) }}"
+                                       class="btn btn-sm btn-primary">Show relatives</a>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                </div>
+            {% else %}
+                <div class="col-12">
+                    <div class="alert alert-warning">No data :(</div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</main>
+
+<footer class="container">
+    <p>© ITMO University project for Ontologies and knowledge representations by alexpulich, 2019 </p>
+</footer>
+<script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
+<script src="{{ url_for('static', filename='js/jquery-3.3.1.min.js') }}"></script>
+</body>
+</html>
