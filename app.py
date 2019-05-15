@@ -5,10 +5,10 @@ import os
 
 import vk_api
 
-from flask import Flask, render_template
+from flask import Flask, render_template, current_app
 from flask_wtf import FlaskForm
 from transliterate import translit
-from wtforms import StringField, SubmitField
+from wtforms import BooleanField, StringField, SubmitField
 from wtforms.validators import DataRequired
 from SPARQLWrapper import SPARQLWrapper, JSON
 
@@ -34,18 +34,21 @@ vk_session.auth()
 vk = vk_session.get_api()
 
 
-def search_people(name, date, lang='ru'):
-    sparql.setQuery(
-        """
-        SELECT DISTINCT * where {
-        ?person foaf:givenName "%s"@%s;
-        foaf:name ?full_name;
-        dbo:birthDate ?date.
-        OPTIONAL { ?person dbo:thumbnail ?picture }
-        FILTER(REGEX(?date, "%s"))
-        }
-        """ % (name, lang, date)
-    )
+def search_people(name, date, lang='ru', use_name=True, use_date=True):
+    query = '''SELECT DISTINCT * where { 
+        ?person foaf:name ?full_name;
+        dbo:birthDate ?date. '''
+    if use_name:
+        query += '?person foaf:givenName "%s"@%s. ' % (name, lang)
+    query += 'OPTIONAL { ?person dbo:thumbnail ?picture } '
+    if use_date:
+        query += 'FILTER(REGEX(?date, "%s"))' % date
+
+    query += '} GROUP BY ?person ?full_name'
+
+    current_app.logger.error(query)
+
+    sparql.setQuery(query)
 
     sparql.setReturnFormat(JSON)
     return sparql.query().convert()['results']['bindings']
@@ -118,17 +121,20 @@ def index():
             data = []
         else:
             if RU_REGEXP.match(user[0]['first_name']):
-                first_name = translit(user[0]['first_name'], reversed=True)
+                first_name = translit(user[0]['first_name'], reversed=True).replace("'", '')
             else:
                 first_name = user[0]['first_name']
 
-            d, m, _ = user[0]['bdate'].split('.')
+            birthdate = user[0]['bdate'].split('.')
+            d = birthdate[0]
+            m = birthdate[1]
+
             if int(d) < 10:
                 d = '0' + d
             if int(m) < 10:
                 m = '0' + m
             b_date = f'-{m}-{d}'
-            data = search_people(first_name, b_date, 'en')
+            data = search_people(first_name, b_date, 'en', form.name.data, form.date.data)
 
     return render_template('index.html', form=form, data=data)
 
@@ -145,4 +151,6 @@ def person(uri):
 
 class SearchForm(FlaskForm):
     vk_id = StringField('VK id', validators=[DataRequired()])
+    name = BooleanField('Use name')
+    date = BooleanField('Use date')
     submit = SubmitField('Search!')
