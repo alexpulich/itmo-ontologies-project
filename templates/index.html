@@ -45,7 +45,7 @@
                         </div>
                     {% endfor %}
                 </div>
-            {% else %}
+            {% elif request.method == 'POST' %}
                 <div class="col-12">
                     <div class="alert alert-warning">No data :(</div>
                 </div>
