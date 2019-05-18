@@ -7,11 +7,10 @@ from collections import Counter
 import vk_api
 
 from flask import Flask, render_template, current_app
-from flask_wtf import FlaskForm
 from transliterate import translit
-from wtforms import BooleanField, StringField, SubmitField
-from wtforms.validators import DataRequired
 from SPARQLWrapper import SPARQLWrapper, JSON
+
+from forms import SearchForm
 
 ENDPOINT = 'http://dbpedia.org/sparql'
 RU_REGEXP = re.compile(r'[a-яА-Я]+')
@@ -162,10 +161,3 @@ def person(uri):
     siblings = get_relatives(uri, 'dbp:siblings')
     return render_template('person.html', father=father, mother=mother,
                            spouse=spouse, siblings=siblings)
-
-
-class SearchForm(FlaskForm):
-    vk_id = StringField('VK id', validators=[DataRequired()])
-    name = BooleanField('Use name')
-    date = BooleanField('Use date')
-    submit = SubmitField('Search!')
