@@ -2,6 +2,7 @@ import random
 import re
 import string
 import os
+from collections import Counter
 
 import vk_api
 
@@ -38,11 +39,21 @@ def search_people(name, date, lang='ru', use_name=True, use_date=True):
     query = '''SELECT DISTINCT * where { 
         ?person foaf:name ?full_name;
         dbo:birthDate ?date. '''
+
     if use_name:
         query += '?person foaf:givenName "%s"@%s. ' % (name, lang)
+
     query += 'OPTIONAL { ?person dbo:thumbnail ?picture } '
+
+    query += '''OPTIONAL { 
+    ?person dbo:birthPlace ?country. 
+    ?country rdf:type dbo:Country; 
+    rdfs:label ?country_name } '''
+
     if use_date:
-        query += 'FILTER(REGEX(?date, "%s"))' % date
+        query += 'FILTER(REGEX(?date, "%s")) ' % date
+
+    query += 'FILTER(lang(?country_name) = "en") '
 
     query += '} GROUP BY ?person ?full_name'
 
@@ -107,6 +118,7 @@ def get_relatives(person, relation):
 def index():
     form = SearchForm()
     data = None
+    countries = Counter([])
     if form.validate_on_submit():
 
         try:
@@ -136,7 +148,10 @@ def index():
             b_date = f'-{m}-{d}'
             data = search_people(first_name, b_date, 'en', form.name.data, form.date.data)
 
-    return render_template('index.html', form=form, data=data)
+            countries = Counter([item['country_name']['value'] for item in data if 'country_name' in item])
+            current_app.logger.error(countries)
+
+    return render_template('index.html', form=form, data=data, countries=countries)
 
 
 @app.route('/person/<path:uri>', methods=['GET'])

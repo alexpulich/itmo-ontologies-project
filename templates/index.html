@@ -1,6 +1,5 @@
 {% extends "base.html" %}
 {% block jumbotron_custom %}
-    <p>Find an outstanding person from the past who had some common features with you!</p>
     <form action="" method="post" class="form-inline">
         {{ form.hidden_tag() }}
         {{ form.vk_id(class_="form-control mb-2 mr-sm-2", placeholder="e.g. alexpulich or id1") }}
@@ -18,6 +17,15 @@
 {% block content %}
 
     <div class="container">
+        {% if data %}
+            <div class="row mb-3">
+                <div class="col-12">
+                    <h2>Citizenship</h2>
+                    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+                    <div id="regions_div" style="width: 100%; height: 500px;"></div>
+                </div>
+            </div>
+        {% endif %}
         <div class="row">
             {% if data %}
                 <div class="card-group">
@@ -45,3 +53,32 @@
         </div>
     </div>
 {% endblock %}
+
+{% if data %}
+    {% block footer_scripts %}
+        <script>
+          google.charts.load('current', {
+            'packages': ['geochart'],
+            // Note: you will need to get a mapsApiKey for your project.
+            // See: https://developers.google.com/chart/interactive/docs/basic_load_libs#load-settings
+            'mapsApiKey': 'AIzaSyD-9tSrke72PouQMnMX-a7eZSW0jkFMBWY',
+          })
+          google.charts.setOnLoadCallback(drawRegionsMap)
+
+          function drawRegionsMap () {
+            var data = google.visualization.arrayToDataTable([
+                ['Country', 'Popularity'],
+              {% for country, number in countries.items() %}
+                ['{{ country }}', {{ number }}],
+              {% endfor %}
+            ])
+
+            var options = {}
+
+            var chart = new google.visualization.GeoChart(document.getElementById('regions_div'))
+
+            chart.draw(data, options)
+          }
+        </script>
+    {% endblock %}
+{% endif %}
