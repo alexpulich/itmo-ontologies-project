@@ -1,83 +1,65 @@
 {% extends "base.html" %}
 
+{% import 'macros.html' as macros %}
+
 {% block jumbotron_custom %}
     <a href="{{ url_for('index') }}" class="btn btn-primary">Back to search</a>
 {% endblock %}
 
 {% block content %}
     <div class="container">
+        {% if profile %}
+            <div class="row mb-5">
+                <div class="col-3">
+                    {% if 'image' in profile %}
+                        <img src="{{ profile['image']['value'] }}" alt="" class="img-fluid">
+                    {% else %}
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/a/ac/No_image_available.svg" alt="">
+                    {% endif %}
+                </div>
+                <div class="col-7">
+                    <h1>{{ profile['name']['value'] }}</h1>
+                    <ul>
+                        {% if 'gender' in profile %}
+                            <li><strong>Gender: </strong>{{ profile['gender']['value'] }}</li>
+                        {% endif %}
+                        {% if 'date' in profile %}
+                            <li><strong>Birth date: </strong>{{ profile['date']['value'] }}</li>
+                        {% endif %}
+                        {% if 'country' in profile or 'city' in profile %}
+                            <li><strong>Birth place: </strong>
+                                {% if 'country' in profile %}
+                                    {{ profile['country_name']['value'] }},
+                                {% endif %}
+                                {% if 'city' in profile %}
+                                    {{ profile['city_name']['value'] }}
+                                {% endif %}</li>
+                        {% endif %}
+                        {% if 'abstract' in profile %}
+                            <li><strong>Short bio:</strong><br>{{ profile['abstract']['value'] }}</li>
+                        {% endif %}
+                    </ul>
+                </div>
+            </div>
+        {% endif %}
         <div class="row">
             {% if father or mother or siblings or spouse %}
+                <h2>Relatives</h2>
+                </div>
+                <div class="row">
                 <div class="card-group">
                     {% if father %}
-                        <div class="card">
-                            {% if father['picture'] %}
-                                <img class="card-img-top" src="{{ father['picture']['value'] }}" alt="Card image cap">
-                            {% endif %}
-                            <div class="card-body">
-                                <h5 class="card-title">{{ father['full_name']['value'] }}
-                                    <small class="text-muted">(Father)</small>
-                                </h5>
-                                <p class="card-text"><strong>Birthday: </strong> {{ father['date']['value'] }}</p>
-                            </div>
-                            <div class="card-footer">
-                                <a href="{{ url_for('person', uri=father['relative']['value']) }}"
-                                   class="btn btn-sm btn-primary">Show relatives</a>
-                            </div>
-                        </div>
+                        {{ macros.card(father, 'father') }}
                     {% endif %}
                     {% if mother %}
-                        <div class="card">
-                            {% if mother['picture'] %}
-                                <img class="card-img-top" src="{{ mother['picture']['value'] }}" alt="Card image cap">
-                            {% endif %}
-                            <div class="card-body">
-                                <h5 class="card-title">{{ mother['full_name']['value'] }}
-                                    <small class="text-muted">(Mother)</small>
-                                </h5>
-                                <p class="card-text"><strong>Birthday: </strong> {{ mother['date']['value'] }}</p>
-                            </div>
-                            <div class="card-footer">
-                                <a href="{{ url_for('person', uri=mother['relative']['value']) }}"
-                                   class="btn btn-sm btn-primary">Show relatives</a>
-                            </div>
-                        </div>
+                        {{ macros.card(mother, 'mother') }}
                     {% endif %}
                     {% if spouse %}
-                        <div class="card">
-                            {% if spouse['picture'] %}
-                                <img class="card-img-top" src="{{ spouse['picture']['value'] }}" alt="Card image cap">
-                            {% endif %}
-                            <div class="card-body">
-                                <h5 class="card-title">{{ spouse['full_name']['value'] }}
-                                    <small class="text-muted">(Spouse)</small>
-                                </h5>
-                                <p class="card-text"><strong>Birthday: </strong> {{ spouse['date']['value'] }}</p>
-                            </div>
-                            <div class="card-footer">
-                                <a href="{{ url_for('person', uri=spouse['relative']['value']) }}"
-                                   class="btn btn-sm btn-primary">Show relatives</a>
-                            </div>
-                        </div>
+                        {{ macros.card(spouse, 'spouse') }}
                     {% endif %}
                     {% if siblings %}
                         {% for sibling in siblings %}
-                            <div class="card">
-                                {% if sibling['picture'] %}
-                                    <img class="card-img-top" src="{{ sibling['picture']['value'] }}"
-                                         alt="Card image cap">
-                                {% endif %}
-                                <div class="card-body">
-                                    <h5 class="card-title">{{ sibling['full_name']['value'] }}
-                                        <small class="text-muted">(Sibling)</small>
-                                    </h5>
-                                    <p class="card-text"><strong>Birthday: </strong> {{ sibling['date']['value'] }}</p>
-                                </div>
-                                <div class="card-footer">
-                                    <a href="{{ url_for('person', uri=sibling['relative']['value']) }}"
-                                       class="btn btn-sm btn-primary">Show relatives</a>
-                                </div>
-                            </div>
+                            {{ macros.card(sibling, 'sibling') }}
                         {% endfor %}
                     {% endif %}
                 </div>
@@ -86,6 +68,6 @@
                     <div class="alert alert-warning">No data :(</div>
                 </div>
             {% endif %}
-        </div>
+            </div>
     </div>
 {% endblock %}

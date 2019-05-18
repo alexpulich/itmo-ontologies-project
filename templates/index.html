@@ -33,6 +33,10 @@
                         <div class="card" style="min-width: 25%">
                             {% if item['picture'] %}
                                 <img class="card-img-top" src="{{ item['picture']['value'] }}" alt="Card image cap">
+                            {% else %}
+                                <img class="card-img-top"
+                                     src="https://upload.wikimedia.org/wikipedia/commons/a/ac/No_image_available.svg"
+                                     alt="Card image cap">
                             {% endif %}
                             <div class="card-body">
                                 <h5 class="card-title">{{ item['full_name']['value'] }}</h5>
@@ -40,7 +44,7 @@
                             </div>
                             <div class="card-footer">
                                 <a href="{{ url_for('person', uri=item['person']['value']) }}"
-                                   class="btn btn-sm btn-primary">Show relatives</a>
+                                   class="btn btn-sm btn-primary">Show profile</a>
                             </div>
                         </div>
                     {% endfor %}
@@ -67,7 +71,7 @@
 
           function drawRegionsMap () {
             var data = google.visualization.arrayToDataTable([
-                ['Country', 'Popularity'],
+              ['Country', 'Popularity'],
               {% for country, number in countries.items() %}
                 ['{{ country }}', {{ number }}],
               {% endfor %}

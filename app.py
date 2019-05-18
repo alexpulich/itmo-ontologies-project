@@ -10,6 +10,7 @@ from flask import Flask, render_template, current_app
 from transliterate import translit
 from SPARQLWrapper import SPARQLWrapper, JSON
 
+from decorators import prefix_uri
 from forms import SearchForm
 
 ENDPOINT = 'http://dbpedia.org/sparql'
@@ -35,7 +36,16 @@ vk = vk_session.get_api()
 
 
 def search_people(name, date, lang='ru', use_name=True, use_date=True):
-    query = '''SELECT DISTINCT * where { 
+    if not use_name and not use_date:
+        use_name = True
+        use_date = True
+
+    query = '''SELECT DISTINCT sample(?person) as ?person, 
+    sample(?full_name) as ?full_name, 
+    sample(?date) as ?date, 
+    sample(?country_name) as ?country_name,
+    sample(?picture) as ?picture 
+    where { 
         ?person foaf:name ?full_name;
         dbo:birthDate ?date. '''
 
@@ -52,9 +62,11 @@ def search_people(name, date, lang='ru', use_name=True, use_date=True):
     if use_date:
         query += 'FILTER(REGEX(?date, "%s")) ' % date
 
-    query += 'FILTER(lang(?country_name) = "en") '
+    query += '''FILTER(lang(?country_name) = "en") 
+    FILTER(lang(?country_name) = "en")
+    '''
 
-    query += '} GROUP BY ?person ?full_name'
+    query += '} GROUP BY ?person ?full_name ORDER BY ?full_name'
 
     current_app.logger.error(query)
 
@@ -64,12 +76,8 @@ def search_people(name, date, lang='ru', use_name=True, use_date=True):
     return sparql.query().convert()['results']['bindings']
 
 
+@prefix_uri
 def get_relative(person, relation):
-    if person.startswith('http://dbpedia.org/resource/'):
-        person = person.replace('http://dbpedia.org/resource/', 'dbr:')
-    else:
-        return None
-
     sparql.setQuery(
         """
         select *
@@ -89,12 +97,8 @@ def get_relative(person, relation):
     return results[0] if len(results) > 0 else None
 
 
+@prefix_uri
 def get_relatives(person, relation):
-    if person.startswith('http://dbpedia.org/resource/'):
-        person = person.replace('http://dbpedia.org/resource/', 'dbr:')
-    else:
-        return None
-
     sparql.setQuery(
         """
         select *
@@ -111,6 +115,40 @@ def get_relatives(person, relation):
 
     sparql.setReturnFormat(JSON)
     return sparql.query().convert()['results']['bindings']
+
+
+@prefix_uri
+def get_bio(uri):
+    sparql.setQuery(
+        '''SELECT * WHERE {{
+        {0} foaf:name ?name.
+        OPTIONAL {{{0} foaf:gender ?gender}}
+        OPTIONAL {{{0} dbo:abstract ?abstract}}
+        OPTIONAL {{{0} dbo:birthDate ?date}}
+        OPTIONAL {{
+        {0} dbo:birthPlace ?country.
+        ?country rdf:type dbo:Country;
+        rdfs:label ?country_name
+        }}
+        OPTIONAL {{
+        {0} dbo:birthPlace ?city.
+        ?city rdf:type dbo:City;
+        rdfs:label ?city_name
+        }}
+        OPTIONAL {{{0} dbo:thumbnail ?image}}
+        FILTER(lang(?gender) = 'en')
+        FILTER(lang(?name) = 'en')
+        FILTER(lang(?abstract) = 'en')
+        FILTER(lang(?country_name) = 'en')
+        FILTER(lang(?city_name) = 'en')
+        }}
+        LIMIT 1
+        '''.format(uri)
+    )
+
+    sparql.setReturnFormat(JSON)
+    data = sparql.query().convert()['results']['bindings']
+    return data[0] if len(data) > 0 else {}
 
 
 @app.route('/', methods=['GET', 'POST'])
@@ -148,16 +186,16 @@ def index():
             data = search_people(first_name, b_date, 'en', form.name.data, form.date.data)
 
             countries = Counter([item['country_name']['value'] for item in data if 'country_name' in item])
-            current_app.logger.error(countries)
 
     return render_template('index.html', form=form, data=data, countries=countries)
 
 
 @app.route('/person/<path:uri>', methods=['GET'])
 def person(uri):
+    profile = get_bio(uri)
     father = get_relative(uri, 'dbp:father')
     mother = get_relative(uri, 'dbp:mother')
     spouse = get_relative(uri, 'dbo:spouse')
     siblings = get_relatives(uri, 'dbp:siblings')
-    return render_template('person.html', father=father, mother=mother,
+    return render_template('person.html', profile=profile, father=father, mother=mother,
                            spouse=spouse, siblings=siblings)

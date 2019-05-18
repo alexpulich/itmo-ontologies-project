@@ -1,0 +1,21 @@
+{% macro card(item, relation) -%}
+    <div class="card">
+        {% if item['picture'] %}
+            <img class="card-img-top" src="{{ item['picture']['value'] }}"
+                 alt="Card image cap">
+        {% else %}
+            <img src="https://upload.wikimedia.org/wikipedia/commons/a/ac/No_image_available.svg"
+                 alt="">
+        {% endif %}
+        <div class="card-body">
+            <h5 class="card-title">{{ item['full_name']['value'] }}
+                <small class="text-muted">({{ relation }})</small>
+            </h5>
+            <p class="card-text"><strong>Birthday: </strong> {{ item['date']['value'] }}</p>
+        </div>
+        <div class="card-footer">
+            <a href="{{ url_for('person', uri=item['relative']['value']) }}"
+               class="btn btn-sm btn-primary">Show profile</a>
+        </div>
+    </div>
+{%- endmacro %}
