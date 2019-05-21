@@ -20,13 +20,15 @@
         {% if data %}
             <div class="row mb-3">
                 <div class="col-12">
-                    <h2>Citizenship</h2>
+                    <h2>Found by Country</h2>
                     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
                     <div id="regions_div" style="width: 100%; height: 500px;"></div>
                 </div>
             </div>
         {% endif %}
-        <div class="row">
+
+        <h2>People Found</h2>
+        <div class="row" style="margin-left: 0px;">
             {% if data %}
                 <div class="card-group">
                     {% for item in data %}

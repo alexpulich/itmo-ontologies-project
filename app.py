@@ -52,23 +52,19 @@ def search_people(name, date, lang='ru', use_name=True, use_date=True):
     if use_name:
         query += '?person foaf:givenName "%s"@%s. ' % (name, lang)
 
-    query += 'OPTIONAL { ?person dbo:thumbnail ?picture } '
+    query += '\nOPTIONAL { ?person dbo:thumbnail ?picture } '
 
-    query += '''OPTIONAL { 
-    ?person dbo:birthPlace ?country. 
-    ?country rdf:type dbo:Country; 
-    rdfs:label ?country_name } '''
+    query += '''\nOPTIONAL { 
+        ?person dbo:birthPlace ?country. 
+        ?country rdf:type dbo:Country; 
+        rdfs:label ?country_name } '''
 
     if use_date:
-        query += 'FILTER(REGEX(?date, "%s")) ' % date
+        query += '\nFILTER(REGEX(?date, "%s")) ' % date
 
-    query += '''FILTER(lang(?country_name) = "en") 
-    FILTER(lang(?country_name) = "en")
-    '''
+    query += '\nFILTER(lang(?country_name) = "en")\nFILTER(lang(?country_name) = "en") '
 
-    query += '} GROUP BY ?person ?full_name ORDER BY ?full_name'
-
-    current_app.logger.error(query)
+    query += '}\nGROUP BY ?person ?full_name\nORDER BY ?full_name'
 
     sparql.setQuery(query)
 
@@ -95,6 +91,26 @@ def get_relative(person, relation):
     sparql.setReturnFormat(JSON)
     results = sparql.query().convert()['results']['bindings']
     return results[0] if len(results) > 0 else None
+
+@prefix_uri
+def get_inverse_relatives(person, relation):
+    sparql.setQuery(
+        """
+        select *
+        where {
+        ?relative %s %s;
+        foaf:name ?full_name;
+        dbo:birthDate ?date.
+        OPTIONAL { ?relative dbo:thumbnail ?picture }
+        }
+        GROUP BY ?relative ?full_name
+        LIMIT 1
+        """ % (relation, person)
+    )
+
+    sparql.setReturnFormat(JSON)
+    results = sparql.query().convert()['results']['bindings']
+    return results
 
 
 @prefix_uri
@@ -196,6 +212,7 @@ def person(uri):
     father = get_relative(uri, 'dbp:father')
     mother = get_relative(uri, 'dbp:mother')
     spouse = get_relative(uri, 'dbo:spouse')
+    relatives = get_inverse_relatives(uri, 'dbo:relative')
     siblings = get_relatives(uri, 'dbp:siblings')
     return render_template('person.html', profile=profile, father=father, mother=mother,
-                           spouse=spouse, siblings=siblings)
+                           spouse=spouse, siblings=siblings, relatives=relatives)
