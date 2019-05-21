@@ -37,8 +37,7 @@ vk = vk_session.get_api()
 
 def search_people(name, date, lang='ru', use_name=True, use_date=True):
     if not use_name and not use_date:
-        use_name = True
-        use_date = True
+        return None
 
     query = '''SELECT DISTINCT sample(?person) as ?person, 
     sample(?full_name) as ?full_name, 
@@ -190,16 +189,25 @@ def index():
             else:
                 first_name = user[0]['first_name']
 
-            birthdate = user[0]['bdate'].split('.')
+            birthdate_raw = user[0].get('bdate')
+            birthdate = birthdate_raw.split('.') if birthdate_raw else (0, 0, 0)
             d = birthdate[0]
             m = birthdate[1]
+            y = birthdate[2]
 
             if int(d) < 10:
-                d = '0' + d
+                d = '0' + str(d)
             if int(m) < 10:
-                m = '0' + m
-            b_date = f'-{m}-{d}'
-            data = search_people(first_name, b_date, 'en', form.name.data, form.date.data)
+                m = '0' + str(m)
+
+            b_date = ''
+            if form.age.data:
+                b_date += str(y)
+            if form.date.data:
+                b_date += f'-{m}-{d}'
+            use_date = birthdate_raw is not None and (form.date.data or form.age.data)
+
+            data = search_people(first_name, b_date, 'en', form.name.data, use_date)
 
             countries = Counter([item['country_name']['value'] for item in data if 'country_name' in item])
 

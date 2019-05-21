@@ -2,14 +2,18 @@
 {% block jumbotron_custom %}
     <form action="" method="post" class="form-inline">
         {{ form.hidden_tag() }}
-        {{ form.vk_id(class_="form-control mb-2 mr-sm-2", placeholder="e.g. alexpulich or id1") }}
+        {{ form.vk_id(class_="form-control mb-2 mr-sm-2", placeholder="e.g. andrew or id1") }}
         <div class="form-check mb-2 mr-sm-2">
-            {{ form.name(class_="form-check-input", checked=request.args.get('name') == 'y') }}
+            {{ form.name(class_="form-check-input", checked=request.args.get('name') != 'no') }}
             {{ form.name.label(class_="form-check-label") }}
         </div>
         <div class="form-check mb-2 mr-sm-2">
-            {{ form.date(class_="form-check-input", checked=request.args.get('date') == 'y') }}
+            {{ form.date(class_="form-check-input", checked=request.args.get('date') != 'no') }}
             {{ form.date.label(class_="form-check-label") }}
+        </div>
+        <div class="form-check mb-2 mr-sm-2">
+            {{ form.age(class_="form-check-input", checked=request.args.get('age') == 'no') }}
+            {{ form.age.label(class_="form-check-label") }}
         </div>
         {{ form.submit(class_="btn btn-primary mb-2") }}
     </form>
