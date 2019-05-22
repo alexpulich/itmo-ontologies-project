@@ -117,6 +117,41 @@ def get_inverse_relatives(person, relation):
     results = sparql.query().convert()['results']['bindings']
     return results
 
+def get_bio(person):
+    sparql.setQuery('''
+        SELECT distinct 
+            ?person
+            ?date
+            ?fullname
+            ?picture 
+            ?gender
+            ?place
+            WHERE {
+              ?person rdfs:label ?fullname.
+              wd:%s wdt:P31 wd:Q5. 
+              wd:%s rdfs:label ?fullname.
+              
+              wd:%s wdt:P569 ?date.
+              OPTIONAL{
+              wd:%s wdt:P21 ?genderObj.
+              ?genderObj rdfs:label ?gender.
+              FILTER(LangMatches(lang(?gender), 'en'))
+              }
+              OPTIONAL{
+              wd:%s wdt:P19 ?placeObj.
+              ?placeObj rdfs:label ?place.
+              FILTER(LangMatches(lang(?place), 'en'))
+              }
+              
+              OPTIONAL { wd:%s wdt:P18 ?picture }
+              
+              FILTER(LangMatches(lang(?fullname), 'en'))
+          }
+  
+    ''' % (person,person,person,person,person,person))
+    sparql.setReturnFormat(JSON)
+    data = sparql.query().convert()['results']['bindings']
+    return data[0] if len(data) > 0 else {}
 
 def get_entity_key(name):
     #'http://www.wikidata.org/entity/Q123'
@@ -128,3 +163,5 @@ def get_entity_key(name):
 #print(get_relative('Q149067', father_relation))
 
 #print(get_relatives('Q149067', sinblings_relation))
+
+#print(get_bio('Q149067'))
