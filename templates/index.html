@@ -3,6 +3,12 @@
     <form action="" method="post" class="form-inline">
         {{ form.hidden_tag() }}
         {{ form.vk_id(class_="form-control mb-2 mr-sm-2", placeholder="e.g. andrew or id1") }}
+        {% for subfield in form.api %}
+        <span>
+            <span>{{ subfield }}</span>
+            <span>{{ subfield.label }}</span>
+        </span>
+        {% endfor %}
         <div class="form-check mb-2 mr-sm-2">
             {{ form.name(class_="form-check-input", checked=request.args.get('name') != 'no') }}
             {{ form.name.label(class_="form-check-label") }}

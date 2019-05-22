@@ -1,19 +1,22 @@
-from SPARQLWrapper import SPARQLWrapper, JSON
+import SPARQLWrapper
 
 ENDPOINT = 'http://query.wikidata.org/bigdata/namespace/wdq/sparql'
-
-sparql = SPARQLWrapper(ENDPOINT)
+wd_sparql = SPARQLWrapper.SPARQLWrapper(ENDPOINT)
 
 father_relation = 'wdt:P22'
 mother_relation = 'wdt:P25'
 sinblings_relation = 'wdt:P3373'
 
-def search_people(name, day, month, lang='ru', use_name=True, use_date=True):
-    if not use_name and not use_date:
+
+def search_people(name, birthdate, use_name, use_date, use_age, lang='ru'):
+    if not use_name and not use_date and not use_age:
         return None
 
+    day = birthdate[0]
+    month = birthdate[1]
+
     query = '''SELECT distinct 
-                ?person ?date ?full_name 
+                ?person ?date ?full_name ?country_name ?picture
                 WHERE {
                     ?person wdt:P31 wd:Q5. 
                     ?person wdt:P569 ?date.
@@ -21,9 +24,10 @@ def search_people(name, day, month, lang='ru', use_name=True, use_date=True):
     '''
 
     if use_name:
-        query += '?person rdfs:label "%s"@%s. ' % (name, lang)
+        query += '?person wdt:P735 ?name_label. ?name_label rdfs:label "%s"@%s.' % (name, lang)
 
     query += '\nOPTIONAL { ?person wdt:P18 ?picture } '
+    query += '\nOPTIONAL { ?person wdt:P27 ?country. ?country rdfs:label ?country_name }'
 
     query += '''\nOPTIONAL { 
         ?person wd:P19 ?place. 
@@ -33,14 +37,17 @@ def search_people(name, day, month, lang='ru', use_name=True, use_date=True):
     if use_date:
         query += '\n FILTER(DAY(?date)=%s && MONTH(?date)=%s)' % (day, month)
 
-    query += '\n FILTER(langMatches(lang(?full_name),"%s"))' % lang
+    query += '\n FILTER(langMatches(lang(?full_name),"%s"))' % (lang)
+    query += '\n FILTER(langMatches(lang(?country_name),"%s"))' % (lang)
 
     query += '}'
 
-    sparql.setQuery(query)
+    wd_sparql.setQuery(query)
 
-    sparql.setReturnFormat(JSON)
-    return sparql.query().convert()['results']['bindings']
+    wd_sparql.setReturnFormat(SPARQLWrapper.JSON)
+    sparql_result = wd_sparql.query()
+    converted_result = sparql_result.convert()
+    return converted_result['results']['bindings']
 
 
 def get_relative(person, relation):
@@ -60,14 +67,14 @@ def get_relative(person, relation):
               FILTER( LangMatches(lang(?fullname),'en'))
         }''' % (person, relation, person)
 
-    sparql.setQuery(query)
-    sparql.setReturnFormat(JSON)
-    results = sparql.query().convert()['results']['bindings']
+    wd_sparql.setQuery(query)
+    wd_sparql.setReturnFormat(SPARQLWrapper.JSON)
+    results = wd_sparql.query().convert()['results']['bindings']
     return results[0] if len(results) > 0 else None
 
 
 def get_relatives(person, relation):
-    sparql.setQuery('''
+    wd_sparql.setQuery('''
     SELECT
     distinct
     ?relative
@@ -87,13 +94,13 @@ def get_relatives(person, relation):
         FILTER(LangMatches(lang(?fullname), 'en'))
     }''' % (person, relation, person))
 
-    sparql.setReturnFormat(JSON)
-    results = sparql.query().convert()['results']['bindings']
+    wd_sparql.setReturnFormat(SPARQLWrapper.JSON)
+    results = wd_sparql.query().convert()['results']['bindings']
     return results
 
 
 def get_inverse_relatives(person, relation):
-    sparql.setQuery('''
+    wd_sparql.setQuery('''
     SELECT
     distinct
     ?relative
@@ -113,12 +120,12 @@ def get_inverse_relatives(person, relation):
         FILTER(LangMatches(lang(?fullname), 'en'))
     }''' % (person, relation, person))
 
-    sparql.setReturnFormat(JSON)
-    results = sparql.query().convert()['results']['bindings']
+    wd_sparql.setReturnFormat(SPARQLWrapper.JSON)
+    results = wd_sparql.query().convert()['results']['bindings']
     return results
 
 def get_bio(person):
-    sparql.setQuery('''
+    wd_sparql.setQuery('''
         SELECT distinct 
             ?person
             ?date
@@ -149,19 +156,12 @@ def get_bio(person):
           }
   
     ''' % (person,person,person,person,person,person))
-    sparql.setReturnFormat(JSON)
-    data = sparql.query().convert()['results']['bindings']
+    wd_sparql.setReturnFormat(SPARQLWrapper.JSON)
+    data = wd_sparql.query().convert()['results']['bindings']
     return data[0] if len(data) > 0 else {}
+
 
 def get_entity_key(name):
     #'http://www.wikidata.org/entity/Q123'
     #Q123
     return name[31:]
-
-#print(search_people('Pavel Durov',10,10,'en'))
-
-#print(get_relative('Q149067', father_relation))
-
-#print(get_relatives('Q149067', sinblings_relation))
-
-#print(get_bio('Q149067'))
