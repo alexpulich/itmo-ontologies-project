@@ -28,12 +28,18 @@ def search_people(name, birthdate, use_name, use_date, use_age, lang='ru'):
     if use_date and (month is None and day is None):
         return []
 
-    query = '''SELECT distinct 
-                ?person ?date ?full_name ?country_name ?picture
+    query = '''SELECT 
+    (SAMPLE(?person) as ?person) 
+    (SAMPLE(?date) AS ?date) 
+    (SAMPLE(?full_name) as ?full_name) 
+    (SAMPLE(?country_name) as ?country_name) 
+    (SAMPLE(?picture) as ?picture)
+    (COUNT(?prop) as ?props) 
                 WHERE {
                     ?person wdt:P31 wd:Q5. 
                     ?person wdt:P569 ?date.
                     ?person rdfs:label ?full_name.
+                    ?person ?prop ?x.
     '''
 
     if use_name:
@@ -43,7 +49,8 @@ def search_people(name, birthdate, use_name, use_date, use_age, lang='ru'):
     query += '\nOPTIONAL { ?person wdt:P27 ?country. ?country rdfs:label ?country_name }'
 
     query += '''\nOPTIONAL { 
-        ?person wd:P19 ?place. 
+        ?person wd:P19 ?place.
+         
         ?place 
         rdfs:label ?birthPlace } '''
 
@@ -56,7 +63,7 @@ def search_people(name, birthdate, use_name, use_date, use_age, lang='ru'):
     query += '\n FILTER(langMatches(lang(?full_name),"%s"))' % (lang)
     query += '\n FILTER(langMatches(lang(?country_name),"%s"))' % (lang)
 
-    query += '}'
+    query += '} GROUP BY ?person ORDER BY DESC(?props) LIMIT 100'
 
     wd_sparql.setQuery(query)
 
