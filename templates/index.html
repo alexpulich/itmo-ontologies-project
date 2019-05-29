@@ -42,7 +42,8 @@
             {% if data %}
                 <div class="card-group">
                     {% for item in data %}
-                        <div class="card" style="min-width: 25%">
+                        <div class="col-3 mb-3">
+                        <div class="card">
                             <div style="height:300px; overflow: hidden;">
                                 {% if item['picture'] %}
                                     <img class="card-img-top" src="{{ item['picture']['value'] }}" alt="Card image cap">
@@ -60,6 +61,7 @@
                                 <a href="{{ url_for('person', uri=item['person']['value']) }}"
                                    class="btn btn-sm btn-primary">Show profile</a>
                             </div>
+                        </div>
                         </div>
                     {% endfor %}
                 </div>
