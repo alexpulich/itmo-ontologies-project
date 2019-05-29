@@ -43,13 +43,15 @@
                 <div class="card-group">
                     {% for item in data %}
                         <div class="card" style="min-width: 25%">
-                            {% if item['picture'] %}
-                                <img class="card-img-top" src="{{ item['picture']['value'] }}" alt="Card image cap">
-                            {% else %}
-                                <img class="card-img-top"
-                                     src="https://upload.wikimedia.org/wikipedia/commons/a/ac/No_image_available.svg"
-                                     alt="Card image cap">
-                            {% endif %}
+                            <div style="height:300px; overflow: hidden;">
+                                {% if item['picture'] %}
+                                    <img class="card-img-top" src="{{ item['picture']['value'] }}" alt="Card image cap">
+                                {% else %}
+                                    <img class="card-img-top"
+                                         src="https://upload.wikimedia.org/wikipedia/commons/a/ac/No_image_available.svg"
+                                         alt="Card image cap">
+                                {% endif %}
+                            </div>
                             <div class="card-body">
                                 <h5 class="card-title">{{ item['full_name']['value'] }}</h5>
                                 <p class="card-text"><strong>Birthday: </strong> {{ item['date']['value'] }}</p>
