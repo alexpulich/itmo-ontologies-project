@@ -67,7 +67,10 @@ def index():
             else:
                 data = None
 
-            countries = collections.Counter([item['country_name']['value'] for item in data if 'country_name' in item])
+            if data is not None:
+                countries = collections.Counter([item['country_name']['value'] for item in data if 'country_name' in item])
+            else:
+                countries = collections.Counter()
 
     return render_template('index.html', form=form, data=data, countries=countries)
 
