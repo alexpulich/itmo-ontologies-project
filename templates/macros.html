@@ -1,16 +1,18 @@
 {% macro card(item, relation) -%}
     <div class="col-3 mb-3">
         <div class="card">
+        <div style="height:300px; overflow: hidden;">
             {% if item['picture'] %}
                 <img class="card-img-top" src="{{ item['picture']['value'] }}"
-                     alt="Card image cap">
+                     alt="Card image cap" style="width:100%">
             {% else %}
                 <img src="https://upload.wikimedia.org/wikipedia/commons/a/ac/No_image_available.svg"
-                     alt="">
+                     alt="" style="width:100%">
             {% endif %}
+        </div>
             <div class="card-body">
                 <h5 class="card-title">{{ item['full_name']['value'] }}
-                    <small class="text-muted">({{ relation }})</small>
+                    <br><small class="text-muted">({{ relation }})</small>
                 </h5>
                 <p class="card-text"><strong>Birthday: </strong> {{ item['date']['value'] }}</p>
             </div>

@@ -43,11 +43,11 @@
             </div>
         {% endif %}
         <div class="row">
-            {% if father or mother or siblings or spouse or relatives%}
+            {% if father or mother or siblings or spouse or relatives %}
                 <h2>Relatives</h2>
                 </div>
                 <div class="row">
-                <div class="card-group">
+                <div class="card-group" style="width: 100%">
                     {% if father %}
                         {{ macros.card(father, 'father') }}
                     {% endif %}
