@@ -81,8 +81,8 @@ def person(uri):
     if use_wikidata:
         uri = api.wikidata.get_entity_key(uri)
         profile = api.wikidata.get_bio(uri)
-        father = api.wikidata.get_relative(uri, api.wikidata.father_relation)
-        mother = api.wikidata.get_relative(uri, api.wikidata.mother_relation)
+        father = api.wikidata.get_relative(uri, api.wikidata.father_relation) #name
+        mother = api.wikidata.get_relative(uri, api.wikidata.mother_relation) #name
         siblings = api.wikidata.get_relatives(uri, api.wikidata.sinblings_relation)
         spouse = []
         relatives = []

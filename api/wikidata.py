@@ -161,9 +161,8 @@ def get_bio(person):
             ?gender
             ?place
             WHERE {
-              ?person rdfs:label ?name.
               wd:%s wdt:P31 wd:Q5. 
-              wd:%s rdfs:label ?fullname.
+              wd:%s rdfs:label ?name.
               
               wd:%s wdt:P569 ?date.
               OPTIONAL{
