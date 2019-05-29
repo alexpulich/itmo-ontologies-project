@@ -54,9 +54,11 @@ def search_people(name, date, use_name, use_date, use_age, lang='ru'):
     sample(?full_name) as ?full_name, 
     sample(?date) as ?date, 
     sample(?country_name) as ?country_name,
-    sample(?picture) as ?picture 
+    sample(?picture) as ?picture,
+    count(?prop) as ?props 
     where { 
         ?person foaf:name ?full_name;
+        ?prop ?x;
         dbo:birthDate ?date. '''
 
     if use_name:
@@ -74,7 +76,7 @@ def search_people(name, date, use_name, use_date, use_age, lang='ru'):
 
     query += '\nFILTER(lang(?country_name) = "en")\nFILTER(lang(?country_name) = "en") '
 
-    query += '}\nGROUP BY ?person ?full_name\nORDER BY ?full_name'
+    query += '}\nGROUP BY ?person\nORDER BY DESC(?props) LIMIT 100'
 
     dbpedia_sparql.setQuery(query)
 
