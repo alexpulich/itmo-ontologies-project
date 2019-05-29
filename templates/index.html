@@ -10,15 +10,15 @@
             </div>
         {% endfor %}
         <div class="form-check form-check-inline">
-            {{ form.name(class_="form-check-input", checked=request.args.get('name') == 'y') }}
+            {{ form.name(class_="form-check-input", checked=request.method == 'GET' or request.args.get('name') == 'y') }}
             {{ form.name.label(class_="form-check-label") }}
         </div>
         <div class="form-check form-check-inline">
-            {{ form.date(class_="form-check-input", checked=request.args.get('date') == 'y') }}
+            {{ form.date(class_="form-check-input", checked=request.method == 'GET' or request.args.get('date') == 'y') }}
             {{ form.date.label(class_="form-check-label") }}
         </div>
         <div class="form-check form-check-inline">
-            {{ form.age(class_="form-check-input", checked=request.args.get('age') == 'y') }}
+            {{ form.age(class_="form-check-input", checked=request.method == 'GET' or request.args.get('age') == 'y') }}
             {{ form.age.label(class_="form-check-label") }}
         </div>
         {{ form.submit(class_="btn btn-primary mb-2") }}
