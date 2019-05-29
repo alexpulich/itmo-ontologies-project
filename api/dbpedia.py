@@ -4,11 +4,15 @@ import SPARQLWrapper
 ENDPOINT = 'http://dbpedia.org/sparql'
 dbpedia_sparql = SPARQLWrapper.SPARQLWrapper(ENDPOINT)
 
+
 def prefix_uri(func):
     @wraps(func)
     def prefix(*args, **kwargs):
         if args[0].startswith('http://dbpedia.org/resource/'):
-            modified_uri = args[0].replace('http://dbpedia.org/resource/', 'dbr:')
+            modified_uri = (args[0].replace('http://dbpedia.org/resource/', 'dbr:')
+                            .replace('(', '\(')
+                            .replace(')', '\)'))
+
             new_args = (modified_uri,) + args[1:]
             return func(*new_args, **kwargs)
 
@@ -97,6 +101,7 @@ def get_relative(person, relation):
     dbpedia_sparql.setReturnFormat(SPARQLWrapper.JSON)
     results = dbpedia_sparql.query().convert()['results']['bindings']
     return results[0] if len(results) > 0 else None
+
 
 @prefix_uri
 def get_inverse_relatives(person, relation):
