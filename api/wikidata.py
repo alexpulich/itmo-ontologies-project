@@ -82,16 +82,16 @@ def get_relative(person, relation):
         SELECT distinct 
             ?relative
             ?date
-            ?fullname
+            ?full_name
             ?picture 
             WHERE {
               wd:%s %s ?relative. 
               wd:%s wdt:P31 wd:Q5. 
               ?relative wdt:P569 ?date.
-              ?relative rdfs:label ?fullname.
+              ?relative rdfs:label ?full_name.
             
               OPTIONAL { ?relative wdt:P18 ?picture }
-              FILTER( LangMatches(lang(?fullname),'en'))
+              FILTER( LangMatches(lang(?full_name),'en'))
         }''' % (person, relation, person)
 
     wd_sparql.setQuery(query)
@@ -106,19 +106,19 @@ def get_relatives(person, relation):
     distinct
     ?relative
     ?date
-    ?fullname
+    ?full_name
     ?picture
     WHERE
     {
         wd:%s %s ?relative.
         wd:%s wdt:P31 wd:Q5.
         ?relative wdt:P569 ?date.
-        ?relative rdfs:label ?fullname.
+        ?relative rdfs:label ?full_name.
 
         OPTIONAL
             { ?relative wdt:P18 ?picture} 
         
-        FILTER(LangMatches(lang(?fullname), 'en'))
+        FILTER(LangMatches(lang(?full_name), 'en'))
     }''' % (person, relation, person))
 
     wd_sparql.setReturnFormat(SPARQLWrapper.JSON)
@@ -132,14 +132,14 @@ def get_inverse_relatives(person, relation):
     distinct
     ?relative
     ?date
-    ?fullname
+    ?full_name
     ?picture
     WHERE
     {
         ?relative wd:%s %s.
         wd:%s wdt:P31 wd:Q5.
         ?relative wdt:P569 ?date.
-        ?relative rdfs:label ?fullname.
+        ?relative rdfs:label ?full_name.
 
         OPTIONAL
             { ?relative wdt:P18 ?picture} 
@@ -181,7 +181,7 @@ def get_bio(person):
               
               FILTER(LangMatches(lang(?name), 'en'))
           }
-  
+            LIMIT 1
     ''' % (person,person,person,person,person,person))
     wd_sparql.setReturnFormat(SPARQLWrapper.JSON)
     data = wd_sparql.query().convert()['results']['bindings']
