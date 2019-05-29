@@ -51,7 +51,18 @@ def search_people(name, birthdate, use_name, use_date, use_age, lang='ru'):
     wd_sparql.setReturnFormat(SPARQLWrapper.JSON)
     sparql_result = wd_sparql.query()
     converted_result = sparql_result.convert()
-    return converted_result['results']['bindings']
+    results = converted_result['results']['bindings']
+
+    return results
+    ''' FIXME: это костыль, если не придумаем запрос
+    index = []
+    set_results = []
+    for result in results:
+        if result['person'] not in index:
+            index.append(result['person'])
+            set_results.append(result)
+    return set_results
+    '''
 
 
 def get_relative(person, relation):
