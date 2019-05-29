@@ -164,7 +164,7 @@ def get_bio(person):
             ?person
             ?date
             ?name
-            ?picture 
+            ?image
             ?gender
             ?place
             WHERE {
@@ -183,7 +183,7 @@ def get_bio(person):
               FILTER(LangMatches(lang(?place), 'en'))
               }
               
-              OPTIONAL { wd:%s wdt:P18 ?picture }
+              OPTIONAL { wd:%s wdt:P18 ?image }
               
               FILTER(LangMatches(lang(?name), 'en'))
           }
