@@ -14,6 +14,7 @@ def search_people(name, birthdate, use_name, use_date, use_age, lang='ru'):
 
     day = birthdate[0]
     month = birthdate[1]
+    year = birthdate[2]
 
     query = '''SELECT distinct 
                 ?person ?date ?full_name ?country_name ?picture
@@ -36,6 +37,9 @@ def search_people(name, birthdate, use_name, use_date, use_age, lang='ru'):
 
     if use_date:
         query += '\n FILTER(DAY(?date)=%s && MONTH(?date)=%s)' % (day, month)
+
+    if use_age:
+        query += '\n FILTER(YEAR(?date)=%s)' % (year)
 
     query += '\n FILTER(langMatches(lang(?full_name),"%s"))' % (lang)
     query += '\n FILTER(langMatches(lang(?country_name),"%s"))' % (lang)
