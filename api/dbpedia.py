@@ -48,7 +48,7 @@ def search_people(name, date, use_name, use_date, use_age, lang='ru'):
         b_date += f'-{m}-{d}'
 
     if (use_age or use_date) and b_date == '':
-        return ''
+        return []
 
     query = '''SELECT DISTINCT sample(?person) as ?person, 
     sample(?full_name) as ?full_name, 

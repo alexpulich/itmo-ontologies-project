@@ -12,9 +12,16 @@ def search_people(name, birthdate, use_name, use_date, use_age, lang='ru'):
     if not use_name and not use_date and not use_age:
         return None
 
-    day = birthdate[0]
-    month = birthdate[1]
-    year = birthdate[2]
+    day = None
+    month = None
+    year = None
+
+    if len(birthdate) > 1:
+        day = birthdate[0]
+        month = birthdate[1]
+
+    if len(birthdate) == 3:
+        year = birthdate[2]
 
     query = '''SELECT distinct 
                 ?person ?date ?full_name ?country_name ?picture
@@ -144,12 +151,12 @@ def get_bio(person):
         SELECT distinct 
             ?person
             ?date
-            ?fullname
+            ?name
             ?picture 
             ?gender
             ?place
             WHERE {
-              ?person rdfs:label ?fullname.
+              ?person rdfs:label ?name.
               wd:%s wdt:P31 wd:Q5. 
               wd:%s rdfs:label ?fullname.
               
@@ -167,7 +174,7 @@ def get_bio(person):
               
               OPTIONAL { wd:%s wdt:P18 ?picture }
               
-              FILTER(LangMatches(lang(?fullname), 'en'))
+              FILTER(LangMatches(lang(?name), 'en'))
           }
   
     ''' % (person,person,person,person,person,person))

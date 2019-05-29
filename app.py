@@ -84,8 +84,8 @@ def person(uri):
         father = api.wikidata.get_relative(uri, api.wikidata.father_relation)
         mother = api.wikidata.get_relative(uri, api.wikidata.mother_relation)
         siblings = api.wikidata.get_relatives(uri, api.wikidata.sinblings_relation)
-        spouse = api.wikidata.get_relative(uri, 'dbo:spouse')
-        relatives = api.wikidata.get_inverse_relatives(uri, 'dbo:relative')
+        spouse = []
+        relatives = []
     else:
         profile = api.dbpedia.get_bio(uri)
         father = api.dbpedia.get_relative(uri, 'dbp:father')
