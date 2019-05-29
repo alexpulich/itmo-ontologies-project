@@ -21,9 +21,16 @@ def search_people(name, date, use_name, use_date, use_age, lang='ru'):
     if not use_name and not use_date and not use_age:
         return None
 
-    d = date[0]
-    m = date[1]
-    y = date[2]
+    d = None
+    m = None
+    y = None
+
+    if len(date) > 1:
+        d = date[0]
+        m = date[1]
+
+    if len(date) == 3:
+        y = date[2]
 
     if int(d) < 10:
         d = '0' + str(d)
@@ -31,10 +38,13 @@ def search_people(name, date, use_name, use_date, use_age, lang='ru'):
         m = '0' + str(m)
 
     b_date = ''
-    if use_age:
+    if use_age and y is not None:
         b_date += str(y)
-    if use_date:
+    if use_date and m is not None and d is not None:
         b_date += f'-{m}-{d}'
+
+    if (use_age or use_date) and b_date == '':
+        return ''
 
     query = '''SELECT DISTINCT sample(?person) as ?person, 
     sample(?full_name) as ?full_name, 
