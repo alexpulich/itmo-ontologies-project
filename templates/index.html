@@ -43,25 +43,26 @@
                 <div class="card-group">
                     {% for item in data %}
                         <div class="col-3 mb-3">
-                        <div class="card">
-                            <div style="height:300px; overflow: hidden;">
-                                {% if item['picture'] %}
-                                    <img class="card-img-top" src="{{ item['picture']['value'] }}" alt="Card image cap">
-                                {% else %}
-                                    <img class="card-img-top"
-                                         src="https://upload.wikimedia.org/wikipedia/commons/a/ac/No_image_available.svg"
-                                         alt="Card image cap">
-                                {% endif %}
+                            <div class="card">
+                                <div style="height:300px; overflow: hidden;">
+                                    {% if item['picture'] %}
+                                        <img class="card-img-top" src="{{ item['picture']['value'] }}"
+                                             alt="Card image cap">
+                                    {% else %}
+                                        <img class="card-img-top"
+                                             src="https://upload.wikimedia.org/wikipedia/commons/a/ac/No_image_available.svg"
+                                             alt="Card image cap">
+                                    {% endif %}
+                                </div>
+                                <div class="card-body">
+                                    <h5 class="card-title">{{ item['full_name']['value'] }}</h5>
+                                    <p class="card-text"><strong>Birthday: </strong> {{ item['date']['value'] }}</p>
+                                </div>
+                                <div class="card-footer">
+                                    <a href="{{ url_for('person', uri=item['person']['value']) }}"
+                                       class="btn btn-sm btn-primary">Show profile</a>
+                                </div>
                             </div>
-                            <div class="card-body">
-                                <h5 class="card-title">{{ item['full_name']['value'] }}</h5>
-                                <p class="card-text"><strong>Birthday: </strong> {{ item['date']['value'] }}</p>
-                            </div>
-                            <div class="card-footer">
-                                <a href="{{ url_for('person', uri=item['person']['value']) }}"
-                                   class="btn btn-sm btn-primary">Show profile</a>
-                            </div>
-                        </div>
                         </div>
                     {% endfor %}
                 </div>
