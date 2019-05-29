@@ -71,6 +71,8 @@ def search_people(name, birthdate, use_name, use_date, use_age, lang='ru'):
     sparql_result = wd_sparql.query()
     converted_result = sparql_result.convert()
     results = converted_result['results']['bindings']
+    for index, row in enumerate(results):
+        results[index]['date']['value'] = row['date']['value'][:10]
 
     return results
     ''' FIXME: это костыль, если не придумаем запрос
@@ -130,6 +132,9 @@ def get_relatives(person, relation):
 
     wd_sparql.setReturnFormat(SPARQLWrapper.JSON)
     results = wd_sparql.query().convert()['results']['bindings']
+    for index, row in enumerate(results):
+        results[index]['date']['value'] = row['date']['value'][:10]
+
     return results
 
 
@@ -156,6 +161,9 @@ def get_inverse_relatives(person, relation):
 
     wd_sparql.setReturnFormat(SPARQLWrapper.JSON)
     results = wd_sparql.query().convert()['results']['bindings']
+    for index, row in enumerate(results):
+        results[index]['date']['value'] = row['date']['value'][:10]
+
     return results
 
 def get_bio(person):
@@ -191,6 +199,10 @@ def get_bio(person):
     ''' % (person,person,person,person,person,person))
     wd_sparql.setReturnFormat(SPARQLWrapper.JSON)
     data = wd_sparql.query().convert()['results']['bindings']
+
+    for index, row in enumerate(data):
+        data[index]['date']['value'] = row['date']['value'][:10]
+
     return data[0] if len(data) > 0 else {}
 
 
