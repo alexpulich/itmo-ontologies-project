@@ -23,6 +23,11 @@ def search_people(name, birthdate, use_name, use_date, use_age, lang='ru'):
     if len(birthdate) == 3:
         year = birthdate[2]
 
+    if use_age and year is None:
+        return []
+    if use_date and (month is None and day is None):
+        return []
+
     query = '''SELECT distinct 
                 ?person ?date ?full_name ?country_name ?picture
                 WHERE {
