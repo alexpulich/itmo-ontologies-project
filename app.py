@@ -79,19 +79,20 @@ def index():
 def person(uri):
     use_wikidata = 'wikidata' in uri
     if use_wikidata:
+        uri = api.wikidata.get_entity_key(uri)
         profile = api.wikidata.get_bio(uri)
-        father = api.wikidata.get_relative(uri, 'dbp:father')
-        mother = api.wikidata.get_relative(uri, 'dbp:mother')
+        father = api.wikidata.get_relative(uri, api.wikidata.father_relation)
+        mother = api.wikidata.get_relative(uri, api.wikidata.mother_relation)
+        siblings = api.wikidata.get_relatives(uri, api.wikidata.sinblings_relation)
         spouse = api.wikidata.get_relative(uri, 'dbo:spouse')
         relatives = api.wikidata.get_inverse_relatives(uri, 'dbo:relative')
-        siblings = api.wikidata.get_relatives(uri, 'dbp:siblings')
     else:
         profile = api.dbpedia.get_bio(uri)
         father = api.dbpedia.get_relative(uri, 'dbp:father')
         mother = api.dbpedia.get_relative(uri, 'dbp:mother')
+        siblings = api.dbpedia.get_relatives(uri, 'dbp:siblings')
         spouse = api.dbpedia.get_relative(uri, 'dbo:spouse')
         relatives = api.dbpedia.get_inverse_relatives(uri, 'dbo:relative')
-        siblings = api.dbpedia.get_relatives(uri, 'dbp:siblings')
 
     return render_template('person.html', profile=profile, father=father, mother=mother,
                            spouse=spouse, siblings=siblings, relatives=relatives)
